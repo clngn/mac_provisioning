@@ -1,0 +1,20 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  sudo: no
+  tasks:
+    # TODO: nodebrewからnodeのインストールもtask化する
+    - name: 'install global node modules'
+      npm: name={{ item }} global=yes
+      with_items:
+        - gulp
+        - bower
+        - jshint
+        - csslint
+        - coffee-script
+        - coffeelint
+        - typescript
+        - tslint
+        - less
+      tags: npm-modules

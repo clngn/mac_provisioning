@@ -1,0 +1,54 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  sudo: no
+  vars:
+    homebrew_packages:
+      - { name: cmake }
+      - { name: emacs, install_options: 'cocoa,srgb,with-gnutls,japanese' }
+      - { name: git }
+      # - { name: libevent }
+      - { name: nmap }
+      - { name: nodebrew }
+      - { name: openssl }
+      - { name: pyenv }
+      - { name: pyenv-virtualenv }
+      - { name: rbenv }
+      - { name: readline }
+      - { name: ruby-build }
+      - { name: sqlite }
+      - { name: tmux }
+      - { name: tree }
+      - { name: wget }
+      - { name: zsh }
+  tasks:
+    - name: 'update homebrew'
+      homebrew: update_homebrew=yes
+      tags: brew-update
+
+    - name: 'install brew packages'
+      homebrew: >
+        name={{ item.name }}
+        install_options={{ item.install_options | default() }}
+      with_items: homebrew_packages
+      tags: brew-install
+
+    - name: 'clone dotfiles repo'
+      git: >
+        repo=ssh://git@github.com/clngn/dotfiles.git
+        dest=~/dotfiles
+      tags: init-dotfiles
+    - name: 'link dotfiles'
+      file: src=~/dotfiles/{{ item }} dest=~/{{ item }} state=link
+      with_items:
+        - .atom
+        - .emacs.d
+        - .gitconfig
+        - .gitignore
+        - .pythonrc.py
+        - .tmux.conf
+        - .vim
+        - .vimrc
+        - .zshrc
+      tags: init-dotfiles
